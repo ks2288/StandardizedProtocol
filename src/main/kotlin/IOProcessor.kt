@@ -1,11 +1,15 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 
-import IOPacket.Companion.PAYLOAD_MAX_SIZE
 import org.jetbrains.annotations.VisibleForTesting
 import util.CRC16Utils
 import kotlin.math.ceil
 
 object IOProcessor {
+    /**
+     * Default packet size in bytes, overridable via the [buildPackets] function
+     */
+    private const val DEFAULT_PACKET_SIZE = 64
+
     /**
      * Builds a list of [IOPacket] instances from an aggregate set of [UByte]
      * values
@@ -18,7 +22,7 @@ object IOProcessor {
     fun buildPackets(
         processId: Int,
         data: UByteArray,
-        sliceSize: Int = PAYLOAD_MAX_SIZE
+        sliceSize: Int = DEFAULT_PACKET_SIZE
     ): List<IOPacket> {
         return with(arrayListOf<IOPacket>()) {
             val sliced = sliceData(
@@ -52,7 +56,7 @@ object IOProcessor {
     @VisibleForTesting
     fun sliceData(
         data: UByteArray,
-        sliceSize: Int = PAYLOAD_MAX_SIZE
+        sliceSize: Int = DEFAULT_PACKET_SIZE
     ): List<Pair<UByteArray, UShort>> {
         return with(arrayListOf<Pair<UByteArray, UShort>>()) {
             var remaining = data.size
@@ -71,5 +75,26 @@ object IOProcessor {
             }
             this
         }
+    }
+
+    /**
+     * Generic function for turning UBytes from the payloads of the built
+     * packets into typed class instances via closure
+     *
+     * @param T instance type to be returned
+     * @param packets
+     */
+    inline fun <reified T: Any> reflect(
+        packets: List<IOPacket>,
+        parse: (UByteArray) -> T?
+    ): T? = try {
+        val data = with(arrayListOf<UByte>()) {
+            packets.forEach { addAll(it.payload) }
+            this
+        }
+        parse.invoke(data.toUByteArray())
+    } catch (e: Exception) {
+        println(e.localizedMessage)
+        null
     }
 }

@@ -2,11 +2,7 @@
 
 package util
 
-import kotlin.io.path.Path
-import kotlin.io.path.absolutePathString
-
 object TestConstants {
-    private val PROJECT_ROOT = Path("").absolutePathString()
     val TEST_UBYTE = 0x01.toUByte()
     val TEST_UBYTE_CRC16 = 4129.toUShort()
     val TEST_PACKET_DATA = ubyteArrayOf(
