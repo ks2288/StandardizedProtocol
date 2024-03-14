@@ -8,3 +8,5 @@ for any one of myriad purposes), and other contexts wherein packets of a
 known format might benefit the mitigation of data integrity errors.
 
 ### WIP
+
+Full README and accompanying ICD to be added with v1.0.1
