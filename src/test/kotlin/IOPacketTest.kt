@@ -108,6 +108,32 @@ class IOPacketTest {
         )
     }
 
+    @Test
+    fun testReflectBytesToProperty() {
+        val intBytes = TestReflector.getP1Bytes(packet.payload)
+        val stringBytes = TestReflector.getP2Bytes(packet.payload)
+        val boolArrayBytes = TestReflector.getP3Bytes(packet.payload)
+        val longBytes = TestReflector.getP4Bytes(packet.payload)
+        val floatBytes = TestReflector.getP5Bytes(packet.payload)
+        val i = IOProcessor.reflectProperty<Int>(intBytes)
+        val s = IOProcessor.reflectProperty<String>(stringBytes)
+        val b = IOProcessor.reflectProperty<BooleanArray>(boolArrayBytes)
+        val l = IOProcessor.reflectProperty<Long>(longBytes)
+        val f = IOProcessor.reflectProperty<Float>(floatBytes)
+        assertEquals(
+            listOf(i, s, l, f),
+            listOf(
+                EXPECTED_P1,
+                EXPECTED_P2,
+                EXPECTED_P4,
+                EXPECTED_P5
+            )
+        )
+        b?.forEachIndexed { index, bool, ->
+            assert(bool == EXPECTED_P3[index])
+        }
+    }
+
     companion object {
         private const val TEST_SLICE_SIZE = 8
         private const val EXPECTED_MP_MESSAGE_SIZE = 2

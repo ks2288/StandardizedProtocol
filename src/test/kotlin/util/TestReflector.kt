@@ -1,8 +1,9 @@
-@file:OptIn(ExperimentalUnsignedTypes::class)
-
 package util
 
-import kotlin.math.pow
+import dev.specter.auxi.ext.toBooleanArray
+import dev.specter.auxi.ext.toFloat
+import dev.specter.auxi.ext.toLong
+import dev.specter.auxi.ext.toShiftedInt
 
 /**
  * Test-only class for both testing the Standardized Protocol implementation
@@ -90,86 +91,3 @@ class TestReflector(
         }
     }
 }
-
-/**
- * Shifts through a [ByteArray] of arbitrary length to compound a [Long] value
- *
- * @return compounded [Long] value
- */
-fun ByteArray.toLong(): Long {
-    var value = 0L
-    for (b in this) { value = (value shl 8) + (b.toInt() and 255) }
-    return value
-}
-
-/**
- * Takes a 4-byte array and computes a Float32 according to the IEEE754 spec
- *
- * @return [Float] from 3 bytes of value data, and one byte of exponent data
- */
-fun ByteArray.toFloat(): Float {
-    if(this.size != 4) return 0.0f
-    val sig = this.slice(IntRange(0,2))
-        .toByteArray()
-        .toShiftedInt()
-    val exp = this[3].toShiftedInt().shr(4)
-    val isPos = this[3].toInt() % 2 == 0
-
-    return sig.toFloat() * 10f.pow(if (isPos) exp else -exp)
-}
-
-/**
- * Computes a [BooleanArray] from a [ByteArray] by first calculating a binary
- * string and then taking the 8 individual bits as [Boolean] flags
- *
- * @return computed array of flags
- */
-fun ByteArray.toBooleanArray(): BooleanArray {
-    val sb = StringBuilder()
-    map {
-         val s = String.format(
-             "%8s",
-             Integer.toBinaryString(it.toInt())
-         ).replace(' ', '0')
-        sb.append(s)
-    }
-    return with(arrayListOf<Boolean>()) {
-        sb.forEach { c ->
-            add(c.toString().toInt() == 1)
-        }
-        this.toBooleanArray().reversedArray()
-    }
-}
-
-/**
- * [UByteArray] wrapper for compounding an integer value by shifting through a
- * [ByteArray]
- *
- * @return compounded [Int] value
- */
-fun UByteArray.toShiftedInt() = this.toByteArray().toShiftedInt()
-
-/**
- * Compounds an integer value by shifting through a [ByteArray]
- *
- * @return compounded [Int] value
- */
-fun ByteArray.toShiftedInt(): Int {
-    var value = 0
-    for (b in this) { value = (value shl 8) + (b.toInt() and 255) }
-    return value
-}
-
-/**
- * Shifts a [Byte] to ensure all bits are used in calculation
- *
- * @return calculated [Int] value
- */
-fun Byte.toShiftedInt(): Int = (0 shl 8) + (this.toInt() and 255)
-
-/**
- * Shifts a [UByte] to ensure all bits are used in calculation
- *
- * @return calculated [Int] value
- */
-fun UByte.toShiftedInt(): Int = this.toByte().toShiftedInt()

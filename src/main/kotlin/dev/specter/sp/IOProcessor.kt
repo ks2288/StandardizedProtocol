@@ -2,7 +2,7 @@
 
 package dev.specter.sp
 
-import dev.specter.auxi.ext.toInt
+import dev.specter.auxi.ext.*
 import dev.specter.sp.IOPacket.Companion.CRC_OFFSET
 import dev.specter.sp.IOPacket.Companion.CRC_SIZE
 import dev.specter.sp.IOPacket.Companion.INDEX_OFFSET
@@ -123,8 +123,9 @@ object IOProcessor {
     }
 
     /**
-     * Static method for quickly constructing [StandardizedProtocol]
-     * instances from a provided incoming [UByteArray]
+     * Generic method for quickly constructing [StandardizedProtocol]
+     * instances from a provided incoming [UByteArray]; result is castable
+     * into any SP-compliant class/object
      *
      * @param T: [StandardizedProtocol]-compliant instance
      * @param bytes raw UBytes from which the object will be built
@@ -184,5 +185,25 @@ object IOProcessor {
             parts = parts,
             payload = payload
         ) {} as T
+    }
+
+    /**
+     * Generic method for reflecting individual properties from bytes based
+     * on desired type
+     *
+     * @param T instance type to be returned
+     * @param bytes source payload to be reflected
+     * @return reflected instance of type [T]
+     */
+    inline fun <reified T: Any> reflectProperty(bytes: ByteArray): T? {
+        return when(T::class) {
+            Float::class -> { bytes.toFloat() as T }
+            Boolean::class -> { bytes.toBooleanArray().first() as T }
+            BooleanArray::class -> { bytes.toBooleanArray() as T }
+            Int::class -> { bytes.toShiftedInt() as T }
+            String::class -> { String(bytes) as T }
+            Long::class -> { bytes.toLong() as T }
+            else -> null
+        }
     }
 }

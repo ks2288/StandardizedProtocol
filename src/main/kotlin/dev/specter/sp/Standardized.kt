@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalUnsignedTypes::class)
-
 package dev.specter.sp
 
 import dev.specter.sp.PacketType.*
