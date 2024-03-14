@@ -1,9 +1,9 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 
+import dev.specter.sp.util.CRC16Utils
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import util.CRC16Utils
 import util.TestConstants.TEST_PACKET_DATA
 import util.TestConstants.TEST_UBYTE
 import util.TestConstants.TEST_UBYTE_ARRAY_CRC16
@@ -24,13 +24,13 @@ class CRC16UtilsTest {
 
     @Test
     fun testUByteArrayCrc16() {
-        val crc = CRC16Utils.crc16(uBytes = TEST_PACKET_DATA)
+        val crc = CRC16Utils.crc16(uBytes = TEST_PACKET_DATA.toUByteArray())
         assert(crc == TEST_UBYTE_ARRAY_CRC16)
     }
 
     @Test
     fun testMapBytesForCrc16() {
-        val crc = CRC16Utils.crc16(bytes = TEST_PACKET_DATA.toByteArray())
+        val crc = CRC16Utils.crc16(bytes = TEST_PACKET_DATA)
         assert(crc == TEST_UBYTE_ARRAY_CRC16)
     }
 
@@ -45,7 +45,7 @@ class CRC16UtilsTest {
             val sliceEnd = sliceStart + sliceSize - 1
             val slice = TEST_PACKET_DATA.slice(IntRange(sliceStart, sliceEnd))
             val sliceCrc = CRC16Utils.crc16(
-                uBytes = slice.toUByteArray(),
+                uBytes = slice.toByteArray().toUByteArray(),
                 initial = crc
             )
             crc = sliceCrc
@@ -56,7 +56,7 @@ class CRC16UtilsTest {
     @Test
     fun testMapByteArrayCrcBySlice() {
         val sliceSize = 8
-        val mapped = TEST_PACKET_DATA.toByteArray()
+        val mapped = TEST_PACKET_DATA
         var crc: UShort = 0.toUShort()
         for (i in 0 until 8) {
 

@@ -1,9 +1,9 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 
-package util
+package dev.specter.sp.util
 
-import ext.shl
-import ext.shr
+import dev.specter.auxi.ext.shl
+import dev.specter.auxi.ext.shr
 
 
 /**

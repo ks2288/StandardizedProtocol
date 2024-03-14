@@ -1,5 +1,9 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 
+package dev.specter.sp
+
+import dev.specter.sp.PacketType.*
+
 /**
  * Contract for all data packets being sent to and from sender and receiver
  * modules when standardized communications are necessary for ensuring data
@@ -18,7 +22,7 @@ interface StandardizedProtocol {
     val type: Int
     val index: Int
     val parts: Int
-    val payload: UByteArray
+    val payload: ByteArray
 
     /**
      * Takes each property and reflects them into their [UByteArray]
@@ -26,7 +30,7 @@ interface StandardizedProtocol {
      *
      * @return [UByteArray] containing [UByte] values for all properties
      */
-    fun toUBytes(): UByteArray
+    fun toBytes(): ByteArray
 }
 
 /**
